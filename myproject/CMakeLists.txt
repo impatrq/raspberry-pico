@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.13)
 
 # Pull in SDK (must be before project)
-include(pico_sdk_import.cmake)
+include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
-# Change myproject_test for directory name
-project(hello_usb C CXX ASM)
+# Change project_name with the current project name (sets PROJECT_NAME variable)
+project(myproject C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -15,21 +15,17 @@ endif()
 # Initialize the SDK
 pico_sdk_init()
 
-if (TARGET tinyusb_device)
-    add_executable(usb
-            main.c
-            )
+# Add the source files
+add_executable(${PROJECT_NAME}
+	main.c
+	)
 
-    # pull in common dependencies
-    target_link_libraries(usb pico_stdlib)
+# Add necessary libraries
+target_link_libraries(${PROJECT_NAME} pico_stdlib)
 
-    # enable usb output, disable uart output
-    pico_enable_stdio_usb(usb 1)
-    pico_enable_stdio_uart(usb 0)
+# Enable/disable stdio output
+pico_enable_stdio_usb(${PROJECT_NAME} 1)
+pico_enable_stdio_uart(${PROJECT_NAME} 0)
 
-    # create map/bin/hex/uf2 file etc.
-    pico_add_extra_outputs(usb)
-
-elseif(PICO_ON_DEVICE)
-    message(WARNING "not building hello_usb because TinyUSB submodule is not initialized in the SDK")
-endif()
+# create map/bin/hex file etc.
+pico_add_extra_outputs(${PROJECT_NAME})
