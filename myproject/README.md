@@ -6,7 +6,6 @@ Este directorio contiene lo minimo e indispensable para poder generar un nuevo p
 
 - `main.c`: programa principal con una inicializacion del stdio y el bucle infinito.
 - `CMakeLists.txt`: descripcion y directivas de los archivos fuente (.c) y bibliotecas del proyecto.
-- `build/`: directorio donde se generaran los binarios para flashear la Raspberry Pico.
 
 ## Como modificar
 
@@ -22,6 +21,7 @@ Luego de clonar el repositorio, puede usarse este directorio para crear cualquie
 Una vez que el proyecto este listo para compilar, se abre una terminal en el raiz del proyecto y se escribe:
 
 ```
+mkdir build
 cd build
 cmake -G "MinGW MakeFiles"
 make
