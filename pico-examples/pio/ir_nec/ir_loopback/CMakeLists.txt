@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.13)
+
+# Pull in SDK (must be before project)
+include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+
+project(pio_ir_loopback C CXX ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+
+if (PICO_SDK_VERSION_STRING VERSION_LESS "1.3.0")
+    message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.3.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
+endif()
+
+# Initialize the SDK
+pico_sdk_init()
+
+add_executable (pio_ir_loopback ir_loopback.c)
+
+# link the executable using the IR transmit and receive libraries
+#
+target_link_libraries(pio_ir_loopback LINK_PUBLIC
+  pico_stdlib
+  hardware_pio
+  nec_transmit_library
+  nec_receive_library
+  )
+
+pico_add_extra_outputs(pio_ir_loopback)
