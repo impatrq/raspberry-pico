@@ -1,19 +1,38 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "pico/multicore.h"
 #include "hardware/adc.h"
-#include "hardware/multicore.h"
+
+const float conversion_factor = 3.3f / (1 << 12);
+
+typedef struct sensor {
+    uint16_t raw;
+    float voltage;
+    float temperature;
+} sensor_data_t;
+
+sensor_data_t data;
 
 void core1_main() {
 
     while(1) {
         
         uint16_t raw = adc_read();
-        multicore_fifo_push_blocking(raw);
+        float voltage = raw * conversion_factor;
+        float temperature = 27 - (voltage - 0.706) / 0.001721;
+
+        data.raw = raw;
+        data.voltage = voltage;
+        data.temperature = temperature;
+
+        multicore_fifo_push_blocking(true);
+        sleep_ms(500);
     }
 }
 
 int main() {
     stdio_init_all();
+    sleep_ms(1000);
     printf("ADC multicore!\r\n");
 
     adc_init();
@@ -24,9 +43,12 @@ int main() {
 
     while(1) {
 
-        if(multicore_fifo_rvalid()) {
-            uint32_t raw = multicore_fifo_pop_blocking();
-            printf("Raw value: 0x%3x\r\n");
+        if(multicore_fifo_pop_blocking()) {
+            
+
+            printf("Raw value: 0x%03x\r\n", data.raw);
+            printf("Voltage value: %.2f\r\n", data.voltage);
+            printf("Temperature vlaue: %.2f\r\n\n", data.temperature);
         }
     }
 }

@@ -24,7 +24,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} 
     pico_stdlib 
     hardware_adc 
-    hardware_multicore
+    pico_multicore
 )
 
 # Enable/disable stdio output
