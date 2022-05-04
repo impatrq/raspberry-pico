@@ -23,7 +23,7 @@ Una vez que el proyecto este listo para compilar, se abre una terminal en el rai
 ```
 mkdir build
 cd build
-cmake -G "MinGW MakeFiles"
+cmake -G "MinGW MakeFiles" ..
 make
 ```
 
