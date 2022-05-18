@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
+#include "pico/util/queue.h"
 #include "hardware/adc.h"
 
 const float conversion_factor = 3.3f / (1 << 12);
@@ -11,9 +12,11 @@ typedef struct sensor {
     float temperature;
 } sensor_data_t;
 
-sensor_data_t data;
+queue_t queue;
 
 void core1_main() {
+
+    sensor_data_t data;
 
     while(1) {
         
@@ -25,7 +28,7 @@ void core1_main() {
         data.voltage = voltage;
         data.temperature = temperature;
 
-        multicore_fifo_push_blocking(true);
+        queue_add_blocking(&queue, &data);
         sleep_ms(500);
     }
 }
@@ -39,16 +42,18 @@ int main() {
     adc_set_temp_sensor_enabled(true);
     adc_select_input(4);
 
+    queue_init(&queue, sizeof(sensor_data_t), 1);
+
     multicore_launch_core1(core1_main);
 
     while(1) {
 
-        if(multicore_fifo_pop_blocking()) {
-            
+        sensor_data_t data;
 
-            printf("Raw value: 0x%03x\r\n", data.raw);
-            printf("Voltage value: %.2f\r\n", data.voltage);
-            printf("Temperature vlaue: %.2f\r\n\n", data.temperature);
-        }
+        queue_remove_blocking(&queue, &data);
+
+        printf("Raw value: 0x%03x\r\n", data.raw);
+        printf("Voltage value: %.2f\r\n", data.voltage);
+        printf("Temperature vlaue: %.2f\r\n\n", data.temperature);
     }
 }

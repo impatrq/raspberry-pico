@@ -98,7 +98,7 @@ App|Description
 
 App|Description
 ---|---
-[adc_multicore](multicore/adc_multicore) | Core 1 reads the temperature sensor, stores the results and sends a signal to Core 0 who then prints the data.
+[adc_multicore](multicore/adc_multicore) | Core 1 reads the temperature sensor, stores the results and sends the data to Core 0 through a queue to print.
 [hello_multicore](multicore/hello_multicore) | Launch a function on the second core, printf some messages on each core, and pass data back and forth through the mailbox FIFOs.
 [multicore_fifo_irqs](multicore/multicore_fifo_irqs) | On each core, register and interrupt handler for the mailbox FIFOs. Show how the interrupt fires when that core receives a message. 
 [multicore_runner](multicore/multicore_runner) | Set up the second core to accept, and run, any function pointer pushed into its mailbox FIFO. Push in a few pieces of code and get answers back.
