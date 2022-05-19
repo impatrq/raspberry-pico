@@ -44,7 +44,6 @@ App|Description
 [control_blocks](dma/control_blocks)| Build a control block list, to program a longer sequence of DMA transfers to the UART.
 [channel_irq](dma/channel_irq)| Use an IRQ handler to reconfigure a DMA channel, in order to continuously drive data through a PIO state machine.
 
-
 ### Flash
 
 App|Description
@@ -54,6 +53,12 @@ App|Description
 [program](flash/program)| Erase a flash sector, program one flash page, and read back the data.
 [xip_stream](flash/xip_stream)| Stream data using the XIP stream hardware, which allows data to be DMA'd in the background whilst executing code from flash.
 [ssi_dma](flash/ssi_dma)| DMA directly from the flash interface (continuous SCK clocking) for maximum bulk read performance.
+
+### FreeRTOS
+
+App|Description
+---|---
+[blinky](freertos/blinky)| Creates a task that blinks the Pico built in LED every 500 milliseconds.
 
 ### GPIO
 
