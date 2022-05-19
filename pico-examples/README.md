@@ -59,6 +59,7 @@ App|Description
 App|Description
 ---|---
 [blinky](freertos/blinky)| Creates a task that blinks the Pico built in LED every 500 milliseconds.
+[temperature_sensor](freertos/temperature_sensor)| Creates a task that reads the internal temperature sensor every second and pushes the data through a queue. A second task reads the data when is available and prints it to the console.
 
 ### GPIO
 
