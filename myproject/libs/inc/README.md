@@ -10,4 +10,19 @@ Para incluir un header desde el `main.c` se puede hacer con:
 
 Reemplazando `lib` por el nombre correspondiente del header.
 
-En el directorio hay un template para un header que puede aprovecharse cambiando el nombre y contenido.
+Lo siguiente es un template para un header:
+
+```c
+#ifndef _TEMPLATE_H_
+#define _TEMPLATE_H_
+
+/* Otros include */
+
+/* Macros y definiciones */
+
+/* Typedefs y definiciones de estructuras */
+
+/* Prototipos de funciones */
+
+#endif /* _TEMPLATE_H_ */
+```
