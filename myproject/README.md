@@ -6,15 +6,16 @@ Este directorio contiene lo minimo e indispensable para poder generar un nuevo p
 
 - `main.c`: programa principal con una inicializacion del stdio y el bucle infinito.
 - `CMakeLists.txt`: descripcion y directivas de los archivos fuente (.c) y bibliotecas del proyecto.
+- `libs`: es un directorio para contener bibliotecas adicionales. Dentro, tiene un directorio `inc` para almacenar los headers necesarios para estas bibliotecas.
 
 ## Como modificar
 
 Luego de clonar el repositorio, puede usarse este directorio para crear cualquier nuevo proyecto. Es necesario, pero no indispensable:
 
 - Cambiar le nombre del directorio.
-- Si se hizo el cambio de nombre, se debe cambiar el nombre en la linea 7 de `CMakeLists.txt`.
+- Si se hizo el cambio de nombre, se debe cambiar el nombre en la linea 8 de `CMakeLists.txt`.
 - Si se agregaron bibliotecas adicionales al `main.c` del SDK de la Raspberry Pico, deben agregarse dentro de `target_link_libraries`.
-
+- Si se agregaron bibliotecas dentro del directorio `libs`, se deben seguir las instrucciones en ese directorio para poder agregarlas y linkearlas al resto de los archivos.
 
 ## Como compilar y flashear
 
