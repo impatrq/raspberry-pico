@@ -19,20 +19,29 @@ Luego de clonar el repositorio, puede usarse este directorio para crear cualquie
 
 ## Como compilar y flashear
 
-Una vez que el proyecto este listo para compilar, se abre una terminal en el raiz del proyecto y se escribe:
+En Windows, una vez que el proyecto este listo para compilar, se abre una terminal en el raiz del proyecto y se escribe:
 
-```
+```bash
 mkdir build
 cd build
 cmake -G "MinGW MakeFiles" ..
 make
 ```
 
+Si el sistema operativo es Linux, se corren los comandos:
+
+```bash
+mkdir build
+cd build
+cmake ..
+make -j4
+```
+
 Si los comandos no arrojaron ningun error, entonces puede procederse a conectar la Raspberry Pico por USB a la PC presionando el BOOTSEL para que entre en modo bootloader. Luego, aparecera en la PC como un dispositivo de almacenamiento masivo. Se debe buscar entonces dentro de build el archivo `project_name.uf2` (donde project_name coincidira con el nombre del proyecto que se haya escogido) y copiarse dentro de la unidad que haya sido asignada a la Raspberry. 
 
 Como alternativa, se puede correr en la terminal:
 
-```
+```bash
 cp project_name.uf2 e:
 ```
 
