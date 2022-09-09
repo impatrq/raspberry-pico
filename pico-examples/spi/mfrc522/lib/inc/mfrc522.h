@@ -22,10 +22,10 @@ typedef struct {
     uint8_t rst;
 } mfrc_config_t;
 
-void mfrc522_config_init(mfrc_config_t *config);
-static void mfrc522_write_register(mfrc_reg_t reg, uint8_t value);
+void mfrc_config_init(mfrc_config_t *config);
+static void mfrc_write_register(mfrc_reg_t reg, uint8_t value);
 
-static inline mfrc_config_t mfrc522_get_default_config(void) {
+static inline mfrc_config_t mfrc_get_default_config(void) {
     return (mfrc_config_t) {
         spi0,
         MFRC_DEFAULT_FREQUENCY,
@@ -33,7 +33,7 @@ static inline mfrc_config_t mfrc522_get_default_config(void) {
         SPI0_DEFAULT_MISO, 
         SPI0_DEFAULT_SCK, 
         SPI0_DEFAULT_SS, 
-        -1 
+        -1
     };
 }
 
