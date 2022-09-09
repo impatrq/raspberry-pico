@@ -73,6 +73,6 @@ typedef enum {
     // 						  0x3D			// reserved for production tests
     // 						  0x3E			// reserved for production tests
     // 						  0x3F			// reserved for production tests
-} pcd_register_t;
+} mfrc_reg_t;
 
 #endif  /* MFRC522_REG_H_ */
