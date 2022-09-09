@@ -12,7 +12,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 # Set library root directory
-set(LIBS libs)
+set(LIBS lib)
 
 # SDK versino error message
 if (PICO_SDK_VERSION_STRING VERSION_LESS "1.3.0")
@@ -23,19 +23,22 @@ endif()
 pico_sdk_init()
 
 # Add libraries (remove comment to add)
-# add_library(libs 
+add_library(mfrc
 	# Add libraries with ${LIBS}/FILENAME.c
-# )
+    ${LIBS}/mfrc522.c
+)
 
 # Include header files to library (remove commenta to add headers)
-# target_include_directories(libs PUBLIC 
-#     ${LIBS}/inc
-# )
+target_include_directories(mfrc PUBLIC 
+    ${LIBS}/inc
+)
 
 # Link libraries with SDK (remove comments to link libraries)
-# target_link_libraries(libs 
+target_link_libraries(mfrc 
 	# Add library name to link
-# )
+    pico_stdlib
+    hardware_spi
+)
 
 # Add the source files
 add_executable(${PROJECT_NAME}
@@ -50,8 +53,8 @@ pico_enable_stdio_uart(${PROJECT_NAME} 0)
 target_link_libraries(${PROJECT_NAME} 
     pico_stdlib
     # Remove next comment if libraries where added to the libs directory
-    # libs
-	# Add other libraries used in the main file
+    mfrc
+    # Add other libraries used in the main file
 )
 
 # create map/bin/hex file etc.
