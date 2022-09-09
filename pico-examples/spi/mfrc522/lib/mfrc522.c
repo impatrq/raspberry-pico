@@ -20,4 +20,16 @@ void mfrc522_config_init(mfrc_config_t *config) {
         gpio_init(config->rst);
         gpio_set_dir(config->rst, true); 
     }
+
+    mfrc522_write_register(TxModeReg, 0x00);
+    mfrc522_write_register(RxModeReg, 0x00);
+}
+
+static void mfrc522_write_register(mfrc_reg_t reg, uint8_t value) {
+
+    uint8_t buff[] = {reg, value};
+
+    gpio_put(mfrc->ss, false);
+    spi_write_blocking(mfrc->spi, buff, 2);
+    gpio_put(mfrc->ss, true);
 }

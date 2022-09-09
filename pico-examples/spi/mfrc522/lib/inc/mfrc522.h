@@ -23,6 +23,7 @@ typedef struct {
 } mfrc_config_t;
 
 void mfrc522_config_init(mfrc_config_t *config);
+static void mfrc522_write_register(mfrc_reg_t reg, uint8_t value);
 
 static inline mfrc_config_t mfrc522_get_default_config(void) {
     return (mfrc_config_t) {
