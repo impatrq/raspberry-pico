@@ -20,9 +20,28 @@ void mfrc_config_init(mfrc_config_t *config) {
         gpio_init(config->rst);
         gpio_set_dir(config->rst, true); 
     }
-
+    /* Reset baud rates */
     mfrc_write_register(TxModeReg, 0x00);
     mfrc_write_register(RxModeReg, 0x00);
+    /* Reset ModWidthReg */
+    mfrc_write_register(ModWidthReg, 0x26);
+
+    /* 
+     * When communicating with a PICC we need a timeout if something goes wrong
+	 * f_timer = 13.56 MHz / (2*TPreScaler+1) where TPreScaler = [TPrescaler_Hi:TPrescaler_Lo]
+	 * TPrescaler_Hi are the four low bits in TModeReg. TPrescaler_Lo is TPrescalerReg. 
+     */
+    /* TAuto=1; timer starts automatically at the end of the transmission in all communication modes at all speeds */
+	mfrc_write_register(TModeReg, 0x80);
+    /* TPreScaler = TModeReg[3..0]:TPrescalerReg, ie 0x0A9 = 169 => f_timer=40kHz, ie a timer period of 25μs */
+	mfrc_write_register(TPrescalerReg, 0xA9);
+    /* Reload timer with 0x3E8 = 1000, ie 25ms before timeout */
+	mfrc_write_register(TReloadRegH, 0x03);
+	mfrc_write_register(TReloadRegL, 0xE8);
+	/* Default 0x00. Force a 100 % ASK modulation independent of the ModGsPReg register setting */
+	mfrc_write_register(TxASKReg, 0x40);
+    /* Default 0x3F. Set the preset value for the CRC coprocessor for the CalcCRC command to 0x6363 */
+	mfrc_write_register(ModeReg, 0x3D);
 }
 
 static void mfrc_write_register(mfrc_reg_t reg, uint8_t value) {
@@ -32,4 +51,15 @@ static void mfrc_write_register(mfrc_reg_t reg, uint8_t value) {
     gpio_put(mfrc->ss, false);
     spi_write_blocking(mfrc->spi, buff, 2);
     gpio_put(mfrc->ss, true);
+}
+
+static uint8_t mfrc_read_register(mfrc_reg_t reg) {
+
+    uint8_t *buff;
+
+    gpio_put(mfrc->ss, false);
+    spi_read_blocking(mfrc->spi, 0x00, buff, 1);
+    gpio_put(mfrc->ss, true);
+
+    return *buff;
 }

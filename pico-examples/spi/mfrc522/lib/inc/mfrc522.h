@@ -24,6 +24,7 @@ typedef struct {
 
 void mfrc_config_init(mfrc_config_t *config);
 static void mfrc_write_register(mfrc_reg_t reg, uint8_t value);
+static uint8_t mfrc_read_register(mfrc_reg_t reg);
 
 static inline mfrc_config_t mfrc_get_default_config(void) {
     return (mfrc_config_t) {
