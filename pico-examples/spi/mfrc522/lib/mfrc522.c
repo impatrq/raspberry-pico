@@ -139,7 +139,7 @@ static void mfrc_set_antenna_on(bool on) {
  */
 static void mfrc_do_soft_reset(void) {
     /* Perform a soft reset */
-    mfrc_write_register(CommandReg, mfrc_soft_reset);
+    mfrc_write_register(CommandReg, SoftReset);
     /* Wait for the PowerDown bit in CommandReg to be cleared */
     while(mfrc_read_register(CommandReg) & (1 << 4));
     sleep_ms(50);
