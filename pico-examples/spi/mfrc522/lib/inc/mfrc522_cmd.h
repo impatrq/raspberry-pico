@@ -2,7 +2,7 @@
 #define MFRC522_CMD_H_
 
 /**
- * @brief   MFRC522 commands. Described in chapter 10 of the datasheet
+ * @brief MFRC522 commands. Described in chapter 10 of the datasheet
  */
 typedef enum {
     mfrc_idle				= 0x00,		// no action, cancels current command execution

@@ -2,9 +2,9 @@
 #define MFRC522_REG_H_
 
 /**
- * @brief   MFRC522 registers. Described in chapter 9 of the datasheet
+ * @brief MFRC522 registers. Described in chapter 9 of the datasheet
  * 
- * @note    When using SPI all addresses are shifted one bit left in the "SPI address byte" (section 8.1.2.3)
+ * @note When using SPI all addresses are shifted one bit left in the "SPI address byte" (section 8.1.2.3)
  */
 typedef enum {
     // Page 0: Command and status

@@ -1,7 +1,15 @@
 #include "mfrc522.h"
 
+/**
+ * @brief MFRC struct to keep track of GPIO and SPI used.
+ */
 static mfrc_config_t *mfrc;
 
+/**
+ * @brief Initializes the MFRC module with given configuration.
+ * 
+ * @param config Pointer to the configuration struct.
+ */
 void mfrc_config_init(mfrc_config_t *config) {
     /* Save configuration struct */
     mfrc = config;
@@ -46,35 +54,71 @@ void mfrc_config_init(mfrc_config_t *config) {
     mfrc_set_antenna_on(true);
 }
 
+/**
+ * @brief Writes a value on given register.
+ * 
+ * @param reg Register to write.
+ * @param value Value to write.
+ */
 static void mfrc_write_register(mfrc_reg_t reg, uint8_t value) {
-
+    /* Create an array with the register and value */
     uint8_t buff[] = {reg, value};
-
+    /* Enable module */
     gpio_put(mfrc->ss, false);
+    /* Write buffer */
     spi_write_blocking(mfrc->spi, buff, 2);
+    /* Disable module */
     gpio_put(mfrc->ss, true);
 }
 
+/**
+ * @brief Reads a register and returns the value.
+ * 
+ * @param reg Register to read.
+ * 
+ * @return uint8_t Register value.
+ */
 static uint8_t mfrc_read_register(mfrc_reg_t reg) {
-
+    /* Pointer to store result */
     uint8_t *buff;
-
+    /* Enable module */
     gpio_put(mfrc->ss, false);
+    /* Read register and store value */
     spi_read_blocking(mfrc->spi, 0x00, buff, 1);
+    /* Disable module */
     gpio_put(mfrc->ss, true);
-
+    /* Return register value */
     return *buff;
 }
 
+/**
+ * @brief Turns the antenna on/off by enabling pins
+ * TX1 and TX2.
+ * 
+ * @param on True to turn on, false to turn off.
+ * 
+ * @note After a reset these pins are disabled.
+ */
 static void mfrc_set_antenna_on(bool on) {
-
+    /* Check on value */
     if(on) {
+        /* If on is true, read tx control regiter first */
         uint8_t value = mfrc_read_register(TxControlReg);
+        /* Turn on antenna if off */
         if((value & 0x03) != 0x03) { mfrc_write_register(TxControlReg, value | 0x03); }
     }
+    /* If on is false, turn off antenna */
     else { mfrc_clear_register_mask(TxControlReg, 0x03); }
 }
 
+/**
+ * @brief Performs a soft reset and waits to be on again
+ * 
+ * @note  The datasheet does not mention how long the SoftRest command takes to complete.
+ * But the MFRC522 might have been in soft power-down mode (triggered by bit 4 of CommandReg) 
+ * Section 8.8.2 in the datasheet says the oscillator start-up time is the start up time of the 
+ * crystal + 37,74μs. Let us be generous: 50ms.
+ */
 static void mfrc_do_soft_reset(void) {
     /* Perform a soft reset */
     mfrc_write_register(CommandReg, mfrc_soft_reset);
