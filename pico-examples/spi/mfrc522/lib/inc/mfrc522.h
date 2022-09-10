@@ -37,7 +37,6 @@ typedef enum {
 } mfrc_firmware_version_t;
 
 void mfrc_config_init(mfrc_config_t *config);
-mfrc_firmware_version_t mfrc_do_self_test(void);
 void mfrc_write_register(mfrc_reg_t reg, uint8_t value);
 uint8_t mfrc_read_register(mfrc_reg_t reg);
 void mfrc_write(mfrc_reg_t reg, uint8_t *buff, uint8_t len);

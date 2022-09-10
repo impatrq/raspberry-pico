@@ -31,10 +31,10 @@ void mfrc_config_init(mfrc_config_t *config) {
     /* Soft reset */
     mfrc_do_soft_reset();
     /* Reset baud rates */
-    //mfrc_write_register(TxModeReg, 0x00);
-    //mfrc_write_register(RxModeReg, 0x00);
+    mfrc_write_register(TxModeReg, 0x00);
+    mfrc_write_register(RxModeReg, 0x00);
     /* Reset ModWidthReg */
-    //mfrc_write_register(ModWidthReg, 0x26);
+    mfrc_write_register(ModWidthReg, 0x26);
 
     /* 
      * When communicating with a PICC we need a timeout if something goes wrong
@@ -42,75 +42,18 @@ void mfrc_config_init(mfrc_config_t *config) {
 	 * TPrescaler_Hi are the four low bits in TModeReg. TPrescaler_Lo is TPrescalerReg. 
      */
     /* TAuto=1; timer starts automatically at the end of the transmission in all communication modes at all speeds */
-	mfrc_write_register(TModeReg, 0x8d);
+	mfrc_write_register(TModeReg, 0x80);
     /* TPreScaler = TModeReg[3..0]:TPrescalerReg, ie 0x0A9 = 169 => f_timer=40kHz, ie a timer period of 25μs */
-	mfrc_write_register(TPrescalerReg, 0x3e);
+	mfrc_write_register(TPrescalerReg, 0xa9);
     /* Reload timer with 0x3E8 = 1000, ie 25ms before timeout */
-	mfrc_write_register(TReloadRegH, 0x1e);
-	mfrc_write_register(TReloadRegL, 0x00);
+	mfrc_write_register(TReloadRegH, 0x03);
+	mfrc_write_register(TReloadRegL, 0xe8);
 	/* Default 0x00. Force a 100 % ASK modulation independent of the ModGsPReg register setting */
 	mfrc_write_register(TxASKReg, 0x40);
     /* Default 0x3F. Set the preset value for the CRC coprocessor for the CalcCRC command to 0x6363 */
 	mfrc_write_register(ModeReg, 0x3d);
     /* Enable the antenna driver pins TX1 and TX2 (they were disabled by the reset) */
     mfrc_set_antenna_on(true);
-}
-
-/**
- * @brief Performs a self-test on the MFRC522.
- * 
- * @return mfrc_firmware_version_t Firmware version.
- * 
- * @note See 16.1.1 in http://www.nxp.com/documents/data_sheet/MFRC522.pdf
- */
-mfrc_firmware_version_t mfrc_do_self_test(void) {
-    /* This follows directly the steps outlined in 16.1.1 */
-    /* 1. Perform a soft reset */
-    mfrc_do_soft_reset();
-
-    /* 2. Clear the internal buffer by writing 25 bytes of 0x00 */
-    uint8_t ZEROES[25] = { 0x00 };
-    mfrc_write_register(FIFOLevelReg, 0x80);
-    mfrc_write(FIFODataReg, ZEROES, 25);
-
-    /* 3. Enable self-test */
-    mfrc_write_register(AutoTestReg, 0x09);
-
-    /* 4. Write 0x00 to FIFO buffer */
-    mfrc_write_register(FIFODataReg, 0x00);
-
-    /* 5. Start self-test by issuing the CalcCRC command */
-    mfrc_write_register(CommandReg, CalcCRC);
-
-    /* 6. Wait for self-test to complete */
-    uint8_t n;
-    for (uint8_t i = 0; i < 0xFF; i++) {
-        /*
-         * The datasheet does not specify exact completion condition except 
-         * that FIFO buffer should contain 64 bytes. While selftest is initiated 
-         * by CalcCRC command it behaves differently from normal CRC computation, 
-         * so one can't reliably use DivIrqReg to check for completion.
-         * It is reported that some devices does not trigger CRCIRq flag during selftest.
-         */
-        n = mfrc_read_register(FIFOLevelReg);
-		if (n >= 64) { break; }
-	}
-    /* Stop calculating CRC for new content in the FIFO */
-    mfrc_write_register(CommandReg, Idle);
-
-    /* 7. Read out resulting 64 bytes from the FIFO buffer */
-    uint8_t res[64];
-    mfrc_read(FIFODataReg, res, 64);
-
-    /* Auto self-test done. Reset AutoTestReg to 0 again for normal operation */
-    mfrc_write_register(AutoTestReg, 0x00);
-
-    uint8_t version = mfrc_read_register(VersionReg);
-
-    /* 8. Re initialize */
-    mfrc_config_init(mfrc);
-
-    return (mfrc_firmware_version_t) version;
 }
 
 /**
