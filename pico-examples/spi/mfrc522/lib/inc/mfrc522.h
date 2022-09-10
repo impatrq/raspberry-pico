@@ -26,6 +26,16 @@ typedef struct {
     uint8_t rst;        // Reset GPIO
 } mfrc_config_t;
 
+/**
+ * @brief MFRC firmware version values.
+ */
+typedef enum {
+    FM17522         = 0x88,
+    MFRC522_V0_0    = 0x90,
+    MFRC522_V1_0    = 0x91,
+    MFRC522_V2_0    = 0x92
+} mfrc_firmware_version_t;
+
 void mfrc_config_init(mfrc_config_t *config);
 static void mfrc_write_register(mfrc_reg_t reg, uint8_t value);
 static uint8_t mfrc_read_register(mfrc_reg_t reg);
