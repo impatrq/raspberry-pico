@@ -42,6 +42,8 @@ void mfrc_config_init(mfrc_config_t *config) {
 	mfrc_write_register(TxASKReg, 0x40);
     /* Default 0x3F. Set the preset value for the CRC coprocessor for the CalcCRC command to 0x6363 */
 	mfrc_write_register(ModeReg, 0x3D);
+    /* Enable the antenna driver pins TX1 and TX2 (they were disabled by the reset) */
+    mfrc_set_antenna_on(true);
 }
 
 static void mfrc_write_register(mfrc_reg_t reg, uint8_t value) {
@@ -62,4 +64,13 @@ static uint8_t mfrc_read_register(mfrc_reg_t reg) {
     gpio_put(mfrc->ss, true);
 
     return *buff;
+}
+
+static void mfrc_set_antenna_on(bool on) {
+
+    if(on) {
+        uint8_t value = mfrc_read_register(TxControlReg);
+        if((value & 0x03) != 0x03) { mfrc_write_register(TxControlReg, value | 0x03); }
+    }
+    else { mfrc_clear_register_mask(TxControlReg, 0x03); }
 }
