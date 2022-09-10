@@ -28,11 +28,13 @@ void mfrc_config_init(mfrc_config_t *config) {
         gpio_init(config->rst);
         gpio_set_dir(config->rst, true); 
     }
+    /* Soft reset */
+    mfrc_do_soft_reset();
     /* Reset baud rates */
-    mfrc_write_register(TxModeReg, 0x00);
-    mfrc_write_register(RxModeReg, 0x00);
+    //mfrc_write_register(TxModeReg, 0x00);
+    //mfrc_write_register(RxModeReg, 0x00);
     /* Reset ModWidthReg */
-    mfrc_write_register(ModWidthReg, 0x26);
+    //mfrc_write_register(ModWidthReg, 0x26);
 
     /* 
      * When communicating with a PICC we need a timeout if something goes wrong
@@ -40,16 +42,16 @@ void mfrc_config_init(mfrc_config_t *config) {
 	 * TPrescaler_Hi are the four low bits in TModeReg. TPrescaler_Lo is TPrescalerReg. 
      */
     /* TAuto=1; timer starts automatically at the end of the transmission in all communication modes at all speeds */
-	mfrc_write_register(TModeReg, 0x80);
+	mfrc_write_register(TModeReg, 0x8d);
     /* TPreScaler = TModeReg[3..0]:TPrescalerReg, ie 0x0A9 = 169 => f_timer=40kHz, ie a timer period of 25μs */
-	mfrc_write_register(TPrescalerReg, 0xA9);
+	mfrc_write_register(TPrescalerReg, 0x3e);
     /* Reload timer with 0x3E8 = 1000, ie 25ms before timeout */
-	mfrc_write_register(TReloadRegH, 0x03);
-	mfrc_write_register(TReloadRegL, 0xE8);
+	mfrc_write_register(TReloadRegH, 0x1e);
+	mfrc_write_register(TReloadRegL, 0x00);
 	/* Default 0x00. Force a 100 % ASK modulation independent of the ModGsPReg register setting */
 	mfrc_write_register(TxASKReg, 0x40);
     /* Default 0x3F. Set the preset value for the CRC coprocessor for the CalcCRC command to 0x6363 */
-	mfrc_write_register(ModeReg, 0x3D);
+	mfrc_write_register(ModeReg, 0x3d);
     /* Enable the antenna driver pins TX1 and TX2 (they were disabled by the reset) */
     mfrc_set_antenna_on(true);
 }
@@ -117,9 +119,9 @@ mfrc_firmware_version_t mfrc_do_self_test(void) {
  * @param reg Register to write.
  * @param value Value to write.
  */
-static void mfrc_write_register(mfrc_reg_t reg, uint8_t value) {
+void mfrc_write_register(mfrc_reg_t reg, uint8_t value) {
     /* Create an array with the register and value */
-    uint8_t buff[] = {reg, value};
+    uint8_t buff[] = { reg & 0x7e, value };
     /* Enable module */
     gpio_put(mfrc->ss, false);
     /* Write buffer */
@@ -135,21 +137,21 @@ static void mfrc_write_register(mfrc_reg_t reg, uint8_t value) {
  * 
  * @return uint8_t Register value.
  */
-static uint8_t mfrc_read_register(mfrc_reg_t reg) {
+uint8_t mfrc_read_register(mfrc_reg_t reg) {
     /* Pointer to store result */
-    uint8_t *buff;
+    uint8_t buff;
     /* Register address */
-    uint8_t address = 0x80 | reg;
+    uint8_t address = reg | 0x80;
     /* Enable module */
     gpio_put(mfrc->ss, false);
-    /* Select register */
+    /* Point to register to read */
     spi_write_blocking(mfrc->spi, &address, 1);
     /* Read register and store value */
-    spi_read_blocking(mfrc->spi, 0x00, buff, 1);
+    spi_read_blocking(mfrc->spi, 0x00, &buff, 1);
     /* Disable module */
     gpio_put(mfrc->ss, true);
     /* Return register value */
-    return *buff;
+    return buff;
 }
 
 /**
@@ -159,7 +161,7 @@ static uint8_t mfrc_read_register(mfrc_reg_t reg) {
  * @param buff Pointer to data to write.
  * @param len Number of bytes to write.
  */
-static void mfrc_write(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
+void mfrc_write(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
     /* Enable module */
     gpio_put(mfrc->ss, false);
     /* Write register */
@@ -177,9 +179,9 @@ static void mfrc_write(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
  * @param buff Pointer to buffer to store the bytes.
  * @param len Number of bytes to read.
  */
-static void mfrc_read(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
+void mfrc_read(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
     /* MSB = 1 is for reading. LSB not used in address. Datasheet section 8.1.2.3 */
-    uint8_t address = 0x80 | reg;
+    uint8_t address = reg | 0x80;
     /* Enable module */
     gpio_put(mfrc->ss, false);
     /* Register to read */
@@ -222,6 +224,6 @@ static void mfrc_do_soft_reset(void) {
     /* Perform a soft reset */
     mfrc_write_register(CommandReg, SoftReset);
     /* Wait for the PowerDown bit in CommandReg to be cleared */
+    do { sleep_ms(50); }
     while(mfrc_read_register(CommandReg) & (1 << 4));
-    sleep_ms(50);
 }
