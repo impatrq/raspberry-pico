@@ -138,8 +138,12 @@ static void mfrc_write_register(mfrc_reg_t reg, uint8_t value) {
 static uint8_t mfrc_read_register(mfrc_reg_t reg) {
     /* Pointer to store result */
     uint8_t *buff;
+    /* Register address */
+    uint8_t address = 0x80 | reg;
     /* Enable module */
     gpio_put(mfrc->ss, false);
+    /* Select register */
+    spi_write_blocking(mfrc->spi, &address, 1);
     /* Read register and store value */
     spi_read_blocking(mfrc->spi, 0x00, buff, 1);
     /* Disable module */
@@ -183,6 +187,7 @@ static void mfrc_read(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
     /* Read data from register */
     spi_read_blocking(mfrc->spi, 0x00, buff, len);
     /* Disable module */
+    gpio_put(mfrc->ss, true);
 }
 
 /**
