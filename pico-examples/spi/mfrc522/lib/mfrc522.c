@@ -55,6 +55,63 @@ void mfrc_config_init(mfrc_config_t *config) {
 }
 
 /**
+ * @brief Performs a self-test on the MFRC522.
+ * 
+ * @return mfrc_firmware_version_t Firmware version.
+ * 
+ * @note See 16.1.1 in http://www.nxp.com/documents/data_sheet/MFRC522.pdf
+ */
+mfrc_firmware_version_t mfrc_do_self_test(void) {
+    /* This follows directly the steps outlined in 16.1.1 */
+    /* 1. Perform a soft reset */
+    mfrc_do_soft_reset();
+
+    /* 2. Clear the internal buffer by writing 25 bytes of 0x00 */
+    uint8_t ZEROES[25] = { 0x00 };
+    mfrc_write_register(FIFOLevelReg, 0x80);
+    mfrc_write(FIFODataReg, ZEROES, 25);
+
+    /* 3. Enable self-test */
+    mfrc_write_register(AutoTestReg, 0x09);
+
+    /* 4. Write 0x00 to FIFO buffer */
+    mfrc_write_register(FIFODataReg, 0x00);
+
+    /* 5. Start self-test by issuing the CalcCRC command */
+    mfrc_write_register(CommandReg, CalcCRC);
+
+    /* 6. Wait for self-test to complete */
+    uint8_t n;
+    for (uint8_t i = 0; i < 0xFF; i++) {
+        /*
+         * The datasheet does not specify exact completion condition except 
+         * that FIFO buffer should contain 64 bytes. While selftest is initiated 
+         * by CalcCRC command it behaves differently from normal CRC computation, 
+         * so one can't reliably use DivIrqReg to check for completion.
+         * It is reported that some devices does not trigger CRCIRq flag during selftest.
+         */
+        n = mfrc_read_register(FIFOLevelReg);
+		if (n >= 64) { break; }
+	}
+    /* Stop calculating CRC for new content in the FIFO */
+    mfrc_write_register(CommandReg, Idle);
+
+    /* 7. Read out resulting 64 bytes from the FIFO buffer */
+    uint8_t res[64];
+    mfrc_read(FIFODataReg, res, 64);
+
+    /* Auto self-test done. Reset AutoTestReg to 0 again for normal operation */
+    mfrc_write_register(AutoTestReg, 0x00);
+
+    uint8_t version = mfrc_read_register(VersionReg);
+
+    /* 8. Re initialize */
+    mfrc_config_init(mfrc);
+
+    return (mfrc_firmware_version_t) version;
+}
+
+/**
  * @brief Writes a value on given register.
  * 
  * @param reg Register to write.
