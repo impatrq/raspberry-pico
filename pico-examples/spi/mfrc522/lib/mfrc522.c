@@ -92,6 +92,24 @@ static uint8_t mfrc_read_register(mfrc_reg_t reg) {
 }
 
 /**
+ * @brief Writes to the given register a specified number of bytes.
+ * 
+ * @param reg Register to write.
+ * @param buff Pointer to data to write.
+ * @param len Number of bytes to write.
+ */
+static void mfrc_write(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
+    /* Enable module */
+    gpio_put(mfrc->ss, false);
+    /* Write register */
+    spi_write_blocking(mfrc->spi, &reg, 1);
+    /* Write buffer */
+    spi_write_blocking(mfrc->spi, buff, len);
+    /* Disable module */
+    gpio_put(mfrc->ss, true);
+}
+
+/**
  * @brief Turns the antenna on/off by enabling pins
  * TX1 and TX2.
  * 
