@@ -62,6 +62,16 @@ static inline mfrc_config_t mfrc_get_default_config(void) {
 }
 
 /**
+ * @brief Initializes MFRC522 with default configuration 
+ */
+static inline void mfrc_init(void) { 
+    /* Get default config */
+    mfrc_config_t config = mfrc_get_default_config();
+    /* Initialize MFRC522 with default configuration */
+    mfrc_config_init(&config);
+}
+
+/**
  * @brief Clears the given bits on a register.
  * 
  * @param reg Register to write.
