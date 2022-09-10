@@ -170,6 +170,7 @@ App|Description
 [mpu9250_spi](spi/mpu9250_spi) | Attach a MPU9250 accelerometer/gyoscope via SPI.
 [spi_dma](spi/spi_dma) | Use DMA to transfer data both to and from the SPI simultaneously. The SPI is configured for loopback.
 [spi_flash](spi/spi_flash) | Erase, program and read a serial flash device attached to one of the SPI controllers.
+[mfrc522](spi/mfrc522) | [Arduino](https://www.arduino.cc/reference/en/libraries/mfrc522/) based library for RFID reader.
 
 ### System
 
