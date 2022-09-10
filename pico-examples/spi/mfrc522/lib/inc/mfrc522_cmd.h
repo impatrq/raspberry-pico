@@ -1,7 +1,9 @@
 #ifndef MFRC522_CMD_H_
 #define MFRC522_CMD_H_
 
-/* MFRC522 commands. Described in chapter 10 of the datasheet */
+/**
+ * @brief   MFRC522 commands. Described in chapter 10 of the datasheet
+ */
 typedef enum {
     mfrc_idle				= 0x00,		// no action, cancels current command execution
     mfrc_mem				= 0x01,		// stores 25 bytes into the internal buffer
