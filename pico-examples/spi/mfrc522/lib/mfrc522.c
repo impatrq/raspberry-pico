@@ -110,6 +110,25 @@ static void mfrc_write(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
 }
 
 /**
+ * @brief Reads a number of bytes from given register.
+ * 
+ * @param reg Register to read.
+ * @param buff Pointer to buffer to store the bytes.
+ * @param len Number of bytes to read.
+ */
+static void mfrc_read(mfrc_reg_t reg, uint8_t *buff, uint8_t len) {
+    /* MSB = 1 is for reading. LSB not used in address. Datasheet section 8.1.2.3 */
+    uint8_t address = 0x80 | reg;
+    /* Enable module */
+    gpio_put(mfrc->ss, false);
+    /* Register to read */
+    spi_write_blocking(mfrc->spi, &address, 1);
+    /* Read data from register */
+    spi_read_blocking(mfrc->spi, 0x00, buff, len);
+    /* Disable module */
+}
+
+/**
  * @brief Turns the antenna on/off by enabling pins
  * TX1 and TX2.
  * 
