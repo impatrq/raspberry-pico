@@ -2,3 +2,6 @@ build/
 *.zip
 *.rar
 /.vscode/
+/.DS_Store
+/*/.DS_Store
+/*/*/.DS_Store
