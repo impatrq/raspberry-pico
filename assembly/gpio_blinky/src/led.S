@@ -22,10 +22,10 @@
 .equ LED_GPIO_BIT, 25
 
 # Definiciones de funciones globales
-.global init
-.global blink
+.global asm_led_init
+.global asm_led_blink
 
-init:
+asm_led_init:
     # Guardo el valor del RESET_BASE en r0
     ldr r0, =RESET_BASE
     # Guardo el offset para el registro de clear
@@ -72,8 +72,8 @@ rst_wait:
     # Vuelvo a la funcion original
     bx lr
 
-blink:
+asm_led_blink:
     # Conmuto la salida
     str r2, [r0, r1]
     # Vuelvo al bucle
-    b blink
+    bx lr
