@@ -1,11 +1,10 @@
 # Valor para decrementar
-# .equ DELAY_500_MS, 15624999
 .equ DELAY_500_MS, 16624999
 
 # Definicion global de funcion
 .global asm_delay
 
-# A 125 MHz de clock necesito 62500000 ciclos de clock
+# A 133 MHz de clock necesito 66500000 ciclos de clock
 
 asm_delay:
     # Cargo el valor para restar en el registro (2 ciclos)
